@@ -209,6 +209,67 @@ class TetrominoComposite:
         return TetrominoComposite(z_piece, "Test", 1)
 
 ###############################################################################
+class Tetromino:
+###############################################################################
+    """
+    Class representing a single Tetromino
+    """
+
+    TETROMINO_I = 1
+    TETROMINO_J = 2
+    TETROMINO_L = 3
+    TETROMINO_O = 4
+    TETROMINO_S = 5
+    TETROMINO_T = 6
+    TETROMINO_Z = 7
+    TETROMINO_TEST = 8
+
+    def __init__(self, type):
+        """
+        Initialise the tetromino
+
+            type
+                The type of the tetromino
+        """
+        self._type = type
+
+        self._composite = None
+        # Initialise from TetrominoComposite static method
+        if type == Tetromino.TETROMINO_I:
+            self._composite = TetrominoComposite.createI()
+        elif type == Tetromino.TETROMINO_J:
+            self._composite = TetrominoComposite.createJ()
+        elif type == Tetromino.TETROMINO_L:
+            self._composite = TetrominoComposite.createL()
+        elif type == Tetromino.TETROMINO_O:
+            self._composite = TetrominoComposite.createO()
+        elif type == Tetromino.TETROMINO_S:
+            self._composite = TetrominoComposite.createS()
+        elif type == Tetromino.TETROMINO_T:
+            self._composite = TetrominoComposite.createT()
+        elif type == Tetromino.TETROMINO_Z:
+            self._composite = TetrominoComposite.createZ()
+        elif type == Tetromino.TETROMINO_TEST:
+            self._composite = TetrominoComposite.createTest()
+
+        # Tetromino rotational state
+        self._rotational_state = 0
+        # Tetromino rotational state (previous)
+        self._rotational_state_prev = 0
+
+        # Current position on the board
+        self._position_column = -1
+        self._position_row = -1
+
+    def __str__(self):
+        rtn = ""
+        rtn += f"Tetromino: {self._composite._name}\n"
+        rtn += f"Rotational State: {self._rotational_state}\n"
+        rtn += f"Column: {self._position_column}	Row: {self._position_row}\n\n"
+        rtn += str(self._composite._pieces[self._rotational_state])
+        return rtn
+
+###############################################################################
 class TetrisBoard:
 ###############################################################################
     """
@@ -319,5 +380,9 @@ if __name__ == '__main__':
 #    print(TetrominoComposite.createT())
 #    print("Dump: Z")
 #    print(TetrominoComposite.createZ())
-    print("Dump: Test")
-    print(TetrominoComposite.createTest())
+#    print("Dump: Test")
+#    print(TetrominoComposite.createTest())
+
+
+    tet = Tetromino(Tetromino.TETROMINO_TEST)
+    print(tet)
