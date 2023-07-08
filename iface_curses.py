@@ -7,8 +7,9 @@ Pytuino has a number of interface options, this uses the curses module
 
 import curses
 
-
+###############################################################################
 class PytuinoIface:
+###############################################################################
     """
     Provides a curses based interface to the display/keyboard
     """
@@ -154,7 +155,7 @@ class PytuinoIface:
         self._stdscreen.move(rows, cols)
 
 # Main
-###########################################################################################
+###############################################################################
 if __name__ == '__main__':
     import math
     import time
