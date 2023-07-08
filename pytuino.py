@@ -6,13 +6,16 @@ A text based Tetris implementation
 """
 
 import argparse
+import time
 
-import board_tetris
+from board_tetris import TetrisBoard, Tetromino
 
 import curses
 from iface_curses import PytuinoIface
 
+###############################################################################
 class Pytuino:
+###############################################################################
     """
     Main wrapper of the game
     """
@@ -27,6 +30,9 @@ class Pytuino:
         # Initialise interface
         self._iface = PytuinoIface()
 
+        # Board store
+        self._board = None
+
     def _printd(self, txt, end="\n"):
         """ Print txt if debug flag set """
         if self._debug:
@@ -39,44 +45,15 @@ class Pytuino:
     def run(self):
         """ Main routine """
 
-        import math
-        import time
+        self._board = TetrisBoard()
+        #if not self._board.iface_check(self._iface):
+        if not self._board.iface_check(self._iface, tetro_blk_width=3, tetro_blk_height=2):
+            raise Exception("Pytuino: screen too small")
 
-        hello_str = "Hello World"
-        quit_str = "Press Q to quit"
-        # Current position
-        cur_column = 0
-        cur_row = 0
-        # Next position will add these values
-        add_column = 1
-        add_row = 1
+        self._board._fill_rand_()
 
         while True:
-            self._iface.clear_screen()
-
-            # Truncate sring when it's tail is off screen
-            tmp_len = self._iface._columns - cur_column
-            if tmp_len > len(hello_str):
-                tmp_len = len(hello_str)
-            self._iface.print_str(hello_str[0:tmp_len], cols=cur_column, rows=cur_row, attr=curses.A_BOLD, clr=curses.color_pair(8))
-
-            # Update co-ordinates
-            if add_column == 1:
-                if cur_column == (self._iface._columns - 1):
-                    add_column = -1
-            else:
-                if cur_column == 0:
-                    add_column = 1
-            if add_row == 1:
-                if cur_row == (self._iface._rows - 1):
-                    add_row = -1
-            else:
-                if cur_row == 0:
-                    add_row = 1
-            cur_column += add_column
-            cur_row += add_row
-
-            self._iface.print_str(quit_str, cols=math.floor((self._iface._columns-len(quit_str))/2), rows=(self._iface._rows-1), attr=curses.A_BOLD, clr=curses.color_pair(1))
+            self._board.draw_board(self._iface)
 
             self._iface.redraw()
 
@@ -85,10 +62,10 @@ class Pytuino:
             if key == 'Q':
                 break
 
-            time.sleep(0.05)
+            time.sleep(0.01)
 
 # Main
-###########################################################################################
+###############################################################################
 if __name__ == '__main__':
     # Build option parser
     parser = argparse.ArgumentParser(
@@ -115,9 +92,10 @@ if __name__ == '__main__':
     finally:
         if not pto is None:
             pto.close()
+
+            # Print info on exit
+            print(f"Screen size: {pto._iface._columns}x{pto._iface._rows}")
+            print(f"Number of colours: {pto._iface._max_colours}")
         if not err is None:
             raise err
 
-        # Print info on exit
-        print(f"Screen size: {pto._iface._columns}x{pto._iface._rows}")
-        print(f"Number of colours: {pto._iface._max_colours}")
