@@ -3,7 +3,38 @@
 Pytuino Tetris Board
 
 Tetris board implemented as a 2 dimensional lists
+
+Based on: https://tetris.wiki/Tetris_Guideline
 """
+
+class Tetromino:
+    """
+    Super class for Tetris pieces (tetrominos)
+    """
+
+    def __init__(self, piece):
+        """
+        Initialise the basic struture of the tetromino
+
+            piece
+                2 dimensional list representing the piece
+        """
+        self._piece = piece
+        self._rows = len(piece)
+        self._columns = len(piece[0])
+
+    def __str__(self):
+        rtn = ""
+        for row in self._piece:
+            if len(rtn) > 0:
+                rtn += "\n"
+            for cell in row:
+                if cell == 0:
+                    rtn += "  "
+                else:
+                    rtn += str(cell)+str(cell)
+        return rtn
+
 
 class TetrisBoard:
     """
@@ -51,9 +82,9 @@ class TetrisBoard:
 
     def _fill_rows_(self):
         """
-        Fills the board with correctly sized rows until it is full
+        Fills the board with correctly sized rows until it is full (with 2 additional rows to spawn a new tetromino in)
         """
-        while len(self._board) < self._rows:
+        while len(self._board) < self._rows + 2:
             self._add_row_()
 
     def _fill_rand_(self):
@@ -94,8 +125,15 @@ class TetrisBoard:
 # Main
 ###########################################################################################
 if __name__ == '__main__':
-    tboard = TetrisBoard()
-    tboard._fill_rand_()
-    print(tboard)
-    tboard.remove_rows()
-    print(tboard)
+#    tboard = TetrisBoard()
+#    tboard._fill_rand_()
+#    print(tboard)
+#    tboard.remove_rows()
+#    print(tboard)
+
+    t = []
+    t.append([ 0, 1, 0 ])
+    t.append([ 1, 1, 1 ])
+
+    tmino = Tetromino(t)
+    print(tmino)
