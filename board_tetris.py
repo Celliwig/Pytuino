@@ -7,6 +7,8 @@ Tetris board implemented as a 2 dimensional lists
 Based on: https://tetris.wiki/Tetris_Guideline
 """
 
+import math
+
 ###############################################################################
 class TetrominoSingle:
 ###############################################################################
@@ -286,6 +288,23 @@ class TetrisBoard:
         self._fill_rows_()
         self._max_colours = colours
 
+        # Layout variables
+        # Tetromino block size factors
+        self._renderer_tetromino_block_height = 1
+        self._renderer_tetromino_block_width = 1
+        # Tetris board offset
+        self._renderer_board_offset_column = 0
+        self._renderer_board_offset_row = 0
+        # Score
+        self._renderer_score_show = False
+        self._renderer_score_offset_column = 0
+        self._renderer_score_offset_row = 0
+        # Next tetromino
+        self._renderer_ntetro_show = False
+        self._renderer_ntetro_offset_column = 0
+        self._renderer_ntetro_offset_row = 0
+        self._renderer_ntetro_num = 1
+
     def __str__(self):
         rtn = ""
 
@@ -356,6 +375,74 @@ class TetrisBoard:
 
         # Added any needed rows
         self._fill_rows_()
+
+# Interface related methods
+###############################################################################
+    def iface_check(self, iface, tetro_blk_width=1, tetro_blk_height=1, make_do=True):
+        """
+        Check whether interface is large enough for the board
+        """
+
+        too_small = False
+
+        # Check if interface is too small to render just the board
+        if make_do:
+            # Needed columns is the number of board columns plus 2 for the border
+            needed_columns = (self._columns * tetro_blk_width) + 2
+            # Needed rows is the number of board rows +2 for new tetromino placement plus 1 for border
+            needed_rows = ((self._rows + 2) * tetro_blk_height) + 1
+
+            if iface._columns < needed_columns:
+                too_small = True
+            if iface._rows < needed_rows:
+                too_small = True
+            if too_small:
+                return False
+            else:
+                # Tetromino block size factors
+                self._renderer_tetromino_block_height = tetro_blk_height
+                self._renderer_tetromino_block_width = tetro_blk_width
+                # Tetris board offset
+                self._renderer_board_offset_column = math.floor((iface._columns-needed_columns)/2)
+                self._renderer_board_offset_row = math.floor((iface._rows-needed_rows)/2) + (2 * tetro_blk_height)
+                # Score
+                self._renderer_score_show = False
+                self._renderer_score_offset_column = 0
+                self._renderer_score_offset_row = 0
+                # Next tetromino
+                self._renderer_ntetro_show = False
+                self._renderer_ntetro_offset_column = 0
+                self._renderer_ntetro_offset_row = 0
+                self._renderer_ntetro_num = 1
+
+        # Try to workout a sensible layout based on the size of the screen
+        return True
+
+    def draw_board(self, iface):
+        """ Render the game (includng score, etc) to the screen """
+        # Clear screen
+        iface.clear_screen()
+
+        # Draw board with border
+        row_count = 0
+        for row_index in range(self._rows-1, -1, -1):
+            for repeat_row in range(0, self._renderer_tetromino_block_height):
+                iface.print_str(u'\u2551', cols=self._renderer_board_offset_column, rows=self._renderer_board_offset_row + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+                row = self._board[row_index]
+                for cell in row:
+                    if cell > 0:
+                        cell_txt = u'\u2592' * self._renderer_tetromino_block_width
+                        iface.print_str(cell_txt, attr=iface.TXT_NORMAL, clr=iface.color_pair(cell))
+                    else:
+                        cell_txt = " " * self._renderer_tetromino_block_width
+                        iface.print_str(cell_txt, attr=iface.TXT_BOLD, clr=iface.color_pair(cell))
+                iface.print_str(u'\u2551', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+                row_count += 1
+        # Draw bottom
+        iface.print_str(u'\u255A', cols=self._renderer_board_offset_column, rows=self._renderer_board_offset_row + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+        for repeat_column in range(0, self._columns * self._renderer_tetromino_block_width):
+            iface.print_str(u'\u2550', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+        iface.print_str(u'\u255D', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
 
 # Main
 ###############################################################################
