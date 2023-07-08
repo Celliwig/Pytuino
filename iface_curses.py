@@ -14,6 +14,10 @@ class PytuinoIface:
     Provides a curses based interface to the display/keyboard
     """
 
+    TXT_BOLD = curses.A_BOLD
+    TXT_NORMAL = curses.A_NORMAL
+    TXT_REVERSE = curses.A_REVERSE
+
     COLOUR_BLACK = curses.COLOR_BLACK
     COLOUR_RED = curses.COLOR_RED
     COLOUR_GREEN = curses.COLOR_GREEN
@@ -83,6 +87,10 @@ class PytuinoIface:
         Clear the screen
         """
         self._stdscreen.erase()
+
+    def color_pair(self, colour_index):
+        """Wrapper of curses color_pair"""
+        return curses.color_pair(colour_index)
 
     def get_key(self):
         """
