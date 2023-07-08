@@ -13,6 +13,17 @@ class PytuinoIface:
     Provides a curses based interface to the display/keyboard
     """
 
+    COLOUR_BLACK = curses.COLOR_BLACK
+    COLOUR_RED = curses.COLOR_RED
+    COLOUR_GREEN = curses.COLOR_GREEN
+    COLOUR_YELLOW = curses.COLOR_YELLOW
+    COLOUR_BLUE = curses.COLOR_BLUE
+    COLOUR_MAGENTA = curses.COLOR_MAGENTA
+    COLOUR_CYAN = curses.COLOR_CYAN
+    COLOUR_WHITE = curses.COLOR_WHITE
+    COLOUR_ORANGE = curses.COLOR_WHITE + 1
+    COLOUR_PINK = curses.COLOR_WHITE + 2
+
     def __init__(self):
         """
         Initialise curses interface handling
@@ -35,9 +46,25 @@ class PytuinoIface:
         # Make cursor invisible
         curses.curs_set(0)
 
+        # Add colours
+        curses.init_color(PytuinoIface.COLOUR_ORANGE, 1000, 650, 0)
+        curses.init_color(PytuinoIface.COLOUR_PINK, 1000, 300, 580)
+        # Initialise colour pairs
+        curses.init_pair(1, PytuinoIface.COLOUR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(2, PytuinoIface.COLOUR_BLUE, curses.COLOR_BLACK)
+        curses.init_pair(3, PytuinoIface.COLOUR_ORANGE, curses.COLOR_BLACK)
+        curses.init_pair(4, PytuinoIface.COLOUR_YELLOW, curses.COLOR_BLACK)
+        curses.init_pair(5, PytuinoIface.COLOUR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(6, PytuinoIface.COLOUR_RED, curses.COLOR_BLACK)
+        curses.init_pair(7, PytuinoIface.COLOUR_MAGENTA, curses.COLOR_BLACK)
+        curses.init_pair(8, PytuinoIface.COLOUR_PINK, curses.COLOR_BLACK)
+
         # Store screen size
         self._columns = curses.COLS
         self._rows = curses.LINES
+
+        # Store max colours
+        self._max_colours = curses.COLORS
 
     def close(self):
         """
