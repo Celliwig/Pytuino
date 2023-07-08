@@ -19,10 +19,17 @@ class PytuinoIface:
         """
         # Initialise curses screen
         self._stdscreen = curses.initscr()
+        # Initialise colour
+        self._stdscreen_has_color = False
+        if curses.has_colors():
+            curses.start_color()
+            self._stdscreen_has_color = True
         # Turn off key echo
         curses.noecho()
         # Turn on cbreak mode (get keys when pressed, rather than after 'enter' pressed)
         curses.cbreak()
+        # Set keyboard reading routines as non-blocking
+        self._stdscreen.nodelay(True)
         # Enable conversion of special key (cursor keys, etc) keycodes to curses equivalent
         self._stdscreen.keypad(True)
         # Make cursor invisible
@@ -38,17 +45,40 @@ class PytuinoIface:
         """
         curses.curs_set(1)
         self._stdscreen.keypad(False)
+        self._stdscreen.nodelay(False)
         curses.nocbreak()
         curses.echo()
         curses.endwin()
+
+    def clear_screen(self):
+        """
+        Clear the screen
+        """
+        self._stdscreen.erase()
 
     def get_key(self):
         """
         Return a key(code) if any are pressed (non blocking)
         """
-        return self._stdscreen.getket()
+        try:
+            return self._stdscreen.getkey()
+        except Exception:
+            return ""
 
-    def print_str(self, txt, cols=None, rows=None, attr=None):
+    def init_pair(self, index, foreground, background):
+        """
+        Create colour pairs which are later refenced when inserting text
+
+        index
+            Index of colour pair ro create
+        foreground
+            Foreground colour
+        background
+            Background colour
+        """
+        curses.init_pair(index, foreground, background)
+
+    def print_str(self, txt, cols=None, rows=None, attr=None, clr=None):
         """
         Print a string on screen
 
@@ -60,17 +90,29 @@ class PytuinoIface:
             Row offset
         attr
             Attributes to use
+        clr
+            Colour attributes
         """
         if cols is None and rows is None:
-            if attr is None:
+            if attr is None and (clr is None or self._stdscreen_has_color is False):
                 self._stdscreen.addstr(txt)
             else:
-                self._stdscreen.addstr(txt, attr)
+                attr_combined = 0
+                if not attr is None:
+                    attr_combined |= attr
+                if not clr is None and self._stdscreen_has_color is True:
+                    attr_combined |= clr
+                self._stdscreen.addstr(txt, attr_combined)
         else:
-            if attr is None:
+            if attr is None and (clr is None or self._stdscreen_has_color is False):
                 self._stdscreen.addstr(rows, cols, txt)
             else:
-                self._stdscreen.addstr(rows, cols, txt, attr)
+                attr_combined = 0
+                if not attr is None:
+                    attr_combined |= attr
+                if not clr is None and self._stdscreen_has_color is True:
+                    attr_combined |= clr
+                self._stdscreen.addstr(rows, cols, txt, attr_combined)
 
     def redraw(self):
         """
@@ -78,21 +120,82 @@ class PytuinoIface:
         """
         return self._stdscreen.refresh()
 
+    def set_position(self, cols, rows):
+        """
+        Move cursor to given position
+        """
+        self._stdscreen.move(rows, cols)
+
 # Main
 ###########################################################################################
 if __name__ == '__main__':
+    import math
     import time
 
+    ptoi = None
+    err = None
     try:
         ptoi = PytuinoIface()
 
-        ptoi.print_str("Hello World", attr=(curses.A_BOLD|curses.A_BLINK))
-        ptoi.print_str("Hello World", cols=20, rows=10)
-        ptoi.print_str("Hello World", cols=40, rows=20, attr=(curses.A_BOLD|curses.A_BLINK))
-        ptoi.redraw()
+        ptoi.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        ptoi.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        ptoi.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
 
-        time.sleep(2)
+        hello_str = "Hello World"
+        quit_str = "Press Q to quit"
+        # Current position
+        cur_column = 0
+        cur_row = 0
+        # Next position will add these values
+        add_column = 1
+        add_row = 1
 
-        ptoi.close()
+        while True:
+            ptoi.clear_screen()
+
+            # Truncate sring when it's tail is off screen
+            tmp_len = ptoi._columns - cur_column
+            if tmp_len > len(hello_str):
+                tmp_len = len(hello_str)
+            ptoi.print_str(hello_str[0:tmp_len], cols=cur_column, rows=cur_row, attr=curses.A_BOLD, clr=curses.color_pair(2))
+
+            # Update co-ordinates
+            if add_column == 1:
+                if cur_column == (ptoi._columns - 1):
+                    add_column = -1
+            else:
+                if cur_column == 0:
+                    add_column = 1
+            if add_row == 1:
+                if cur_row == (ptoi._rows - 1):
+                    add_row = -1
+            else:
+                if cur_row == 0:
+                    add_row = 1
+            cur_column += add_column
+            cur_row += add_row
+
+            ptoi.print_str(quit_str, cols=math.floor((ptoi._columns-len(quit_str))/2), rows=(ptoi._rows-1), attr=curses.A_BOLD, clr=curses.color_pair(1))
+
+            ptoi.redraw()
+
+            # Check for quit key
+            key = ptoi.get_key()
+            if key == 'Q':
+                break
+
+            time.sleep(0.05)
+
     except Exception as e:
-        print(f"Error: {e}")
+        err = e
+    finally:
+        if not ptoi is None:
+            ptoi.close()
+        if not err is None:
+            print(f"Last co-ordinates: {cur_column}x{cur_row}")
+            raise err
+
+        # Print info on exit
+        print(f"Screen size: {ptoi._columns}x{ptoi._rows}")
+        print(f"Number of colours: {curses.COLORS}")
+
