@@ -14,6 +14,11 @@ class PytuinoIface:
     Provides a curses based interface to the display/keyboard
     """
 
+    KEY_DOWN = curses.KEY_DOWN
+    KEY_LEFT = curses.KEY_LEFT
+    KEY_RIGHT = curses.KEY_RIGHT
+    KEY_UP = curses.KEY_UP
+
     TXT_BOLD = curses.A_BOLD
     TXT_NORMAL = curses.A_NORMAL
     TXT_REVERSE = curses.A_REVERSE
@@ -100,7 +105,7 @@ class PytuinoIface:
         Return a key(code) if any are pressed (non blocking)
         """
         try:
-            return self._stdscreen.getkey()
+            return self._stdscreen.getch()
         except Exception:
             return ""
 
