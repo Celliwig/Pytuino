@@ -52,7 +52,8 @@ class PytuinoIface:
         curses.curs_set(0)
 
         # Add colours
-        curses.init_color(PytuinoIface.COLOUR_ORANGE, 1000, 650, 0)
+        curses.init_color(PytuinoIface.COLOUR_YELLOW, 1000, 1000, 0)
+        curses.init_color(PytuinoIface.COLOUR_ORANGE, 1000, 500, 0)
         curses.init_color(PytuinoIface.COLOUR_PINK, 1000, 300, 580)
         # Initialise colour pairs
         curses.init_pair(1, PytuinoIface.COLOUR_CYAN, curses.COLOR_BLACK)
@@ -63,6 +64,8 @@ class PytuinoIface:
         curses.init_pair(6, PytuinoIface.COLOUR_RED, curses.COLOR_BLACK)
         curses.init_pair(7, PytuinoIface.COLOUR_MAGENTA, curses.COLOR_BLACK)
         curses.init_pair(8, PytuinoIface.COLOUR_PINK, curses.COLOR_BLACK)
+
+        curses.init_pair(255, PytuinoIface.COLOUR_WHITE, curses.COLOR_BLACK)
 
         # Store screen size
         self._columns = curses.COLS
