@@ -170,6 +170,14 @@ class PytuinoIface:
         """
         self._stdscreen.move(rows, cols)
 
+    def skip_ch(self, skip_chars=1):
+        """
+        Move cursor forward 1 character
+        """
+        tmp_y, tmp_x = self._stdscreen.getyx()
+        tmp_x += skip_chars
+        self._stdscreen.move(tmp_y, tmp_x)
+
 # Main
 ###############################################################################
 if __name__ == '__main__':
