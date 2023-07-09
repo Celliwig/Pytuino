@@ -429,6 +429,32 @@ class TetrisBoard:
             for i in range(self._columns):
                 row[i] = self._rnd.randrange(0, self._max_colours)
 
+    def check_tetromino_position(self, tetromino=None, tetromino_state=None, position_x=None, position_y=None):
+        """
+        Check whether the given tetromino can exist at the given position
+        """
+        if tetromino is None:
+            tetromino = self._tetromino
+        if tetromino_state is None:
+            tetromino_state = tetromino.get_state()
+        if position_x is None:
+            position_x = tetromino.get_posX()
+        if position_y is None:
+            position_y = tetromino.get_posY()
+
+        # Check whether the tetromino is out of bounds
+        tmp_y = position_y + (tetromino_state.get_rows() - 1)
+        for blocks in tetromino_state.get_blocks():
+            tmp_x = position_x
+            for cell in blocks:
+                if cell:
+                    if tmp_x < 0 or tmp_y < 0 or tmp_x >= self._columns or tmp_y >= self._rows:
+                        return False
+                tmp_x += 1
+            tmp_y -= 1
+
+        return True
+
     def get_current_tetromino(self, remove=True):
         """ Return the active tetromino """
         return self._tetromino
@@ -509,13 +535,15 @@ class TetrisBoard:
         if direction == Tetromino.DIR_UP:
             tmp_y += 1
 
-        self._tetromino.set_position(tmp_x, tmp_y)
+        if self.check_tetromino_position(position_x=tmp_x, position_y=tmp_y):
+            self._tetromino.set_position(tmp_x, tmp_y)
 
     def tetromino_rotate(self, direction):
         """
         Rotate the current tetromino in the given direction
         """
-        self._tetromino.rotate(direction)
+        if self.check_tetromino_position(tetromino_state=self._tetromino.rotate(direction, test=True)):
+            self._tetromino.rotate(direction)
 
     def tetromino_start(self):
         """
