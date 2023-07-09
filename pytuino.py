@@ -46,8 +46,7 @@ class Pytuino:
         """ Main routine """
 
         self._board = TetrisBoard()
-        #if not self._board.iface_check(self._iface):
-        if not self._board.iface_check(self._iface, tetro_blk_width=3, tetro_blk_height=2):
+        if not self._board.iface_check(self._iface):
             raise Exception("Pytuino: screen too small")
 
         self._board._fill_rand_()
