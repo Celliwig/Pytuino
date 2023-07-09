@@ -238,6 +238,7 @@ class Tetromino:
     DIR_DOWN = 2
     DIR_LEFT = 3
     DIR_RIGHT = 4
+    DIR_UP = 5
 
     TETROMINO_I = 1
     TETROMINO_J = 2
@@ -505,6 +506,8 @@ class TetrisBoard:
             tmp_x += 1
         if direction == Tetromino.DIR_DOWN:
             tmp_y -= 1
+        if direction == Tetromino.DIR_UP:
+            tmp_y += 1
 
         self._tetromino.set_position(tmp_x, tmp_y)
 
@@ -622,10 +625,8 @@ class TetrisBoard:
                             cell_txt = u'\u2592' * self._renderer_tetromino_block_width
                             iface.print_str(cell_txt, attr=iface.TXT_NORMAL, clr=iface.color_pair(cell))
                         else:
-                            cell_txt = " " * self._renderer_tetromino_block_width
-                            iface.print_str(cell_txt, attr=iface.TXT_BOLD, clr=iface.color_pair(cell))
+                            iface.skip_ch(self._renderer_tetromino_block_width)
                     tetromino_position_y += 1
-
 
 # Main
 ###############################################################################
