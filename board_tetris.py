@@ -381,7 +381,7 @@ class TetrisBoard:
 
 # Interface related methods
 ###############################################################################
-    def iface_check(self, iface, tetro_blk_width=1, tetro_blk_height=1, make_do=True):
+    def iface_check(self, iface, tetro_blk_width=1, tetro_blk_height=1):
         """
         Check whether interface is large enough for the board
         """
@@ -390,71 +390,40 @@ class TetrisBoard:
         if tetro_blk_width > 3 or tetro_blk_height > 2:
             return False
 
-        too_small = False
-
-        # Check if interface is too small to render just the board
-        if make_do:
-            # Needed columns is the number of board columns plus 2 for the border
-            needed_columns = (self._columns * tetro_blk_width) + 2
-            # Needed rows is the number of board rows +2 for new tetromino placement plus 1 for border
-            needed_rows = ((self._rows + 2) * tetro_blk_height) + 1
-
-            if iface._columns < needed_columns:
-                too_small = True
-            if iface._rows < needed_rows:
-                too_small = True
-            if too_small:
-                return False
-            else:
-                # Tetromino block size factors
-                self._renderer_tetromino_block_height = tetro_blk_height
-                self._renderer_tetromino_block_width = tetro_blk_width
-                # Tetris board offset
-                self._renderer_board_offset_column = math.floor(iface._columns/2)-math.floor(((self._columns*tetro_blk_width)+2)/2)
-                self._renderer_board_offset_row = math.floor((iface._rows-needed_rows)/2) + (2 * tetro_blk_height)
-                # Score
-                self._renderer_score_show = False
-                self._renderer_score_offset_column = 0
-                self._renderer_score_offset_row = 0
-                # Next tetromino
-                self._renderer_ntetro_show = False
-                self._renderer_ntetro_offset_column = 0
-                self._renderer_ntetro_offset_row = 0
-                self._renderer_ntetro_num = 1
-
-        # Try to workout a sensible layout based on the size of the screen
-        # Needed columns is the number of board columns plus 2 for the border plus 12 for score plus tetromino preview
-        needed_columns = (self._columns * tetro_blk_width) + 2 + 12 + ((4 * tetro_blk_width) + 2)
+        # Needed columns is the number of board columns plus 2 for the border
+        needed_columns = (self._columns * tetro_blk_width) + 2
         # Needed rows is the number of board rows +2 for new tetromino placement plus 1 for border
         needed_rows = ((self._rows + 2) * tetro_blk_height) + 1
 
+        # Just return if there is not enough space
         if iface._columns < needed_columns:
-             too_small = True
-        if iface._rows < needed_rows:
-             too_small = True
-        if too_small:
              return False
-        else:
-             # Tetromino block size factors
-             self._renderer_tetromino_block_height = tetro_blk_height
-             self._renderer_tetromino_block_width = tetro_blk_width
-             # Tetris board offset
-             self._renderer_board_offset_column = math.floor(iface._columns/2)-math.floor(((self._columns*tetro_blk_width)+2)/2)
-             self._renderer_board_offset_row = math.floor((iface._rows-needed_rows)/2) + (2 * tetro_blk_height)
-             # Score
-             self._renderer_score_show = True
-             self._renderer_score_offset_column = iface._columns-math.floor(self._renderer_board_offset_column/2)
-             self._renderer_score_offset_row = math.floor(iface._rows/2)
-             # Next tetromino
-             self._renderer_ntetro_show = False
-             self._renderer_ntetro_offset_column = 0
-             self._renderer_ntetro_offset_row = 0
-             self._renderer_ntetro_num = 1
+        if iface._rows < needed_rows:
+             return False
+
+        # Try to workout a sensible layout based on the size of the screen
+        # Tetromino block size factors
+        self._renderer_tetromino_block_height = tetro_blk_height
+        self._renderer_tetromino_block_width = tetro_blk_width
+        # Tetris board offset
+        self._renderer_board_offset_column = math.floor(iface._columns/2)-math.floor(((self._columns*tetro_blk_width)+2)/2)
+        self._renderer_board_offset_row = math.floor((iface._rows-needed_rows)/2) + (2 * tetro_blk_height)
 
         # Try enlarging the tetromino block width
-        self.iface_check(iface, tetro_blk_width+1, tetro_blk_height, False)
+        self.iface_check(iface, tetro_blk_width+1, tetro_blk_height)
         if tetro_blk_width == 3:
-            self.iface_check(iface, tetro_blk_width, tetro_blk_height+1, False)
+            self.iface_check(iface, tetro_blk_width, tetro_blk_height+1)
+
+        # Score
+        if self._renderer_board_offset_column >= 12:
+            self._renderer_score_show = True
+            self._renderer_score_offset_column = iface._columns-math.floor(self._renderer_board_offset_column/2)
+            self._renderer_score_offset_row = math.floor(iface._rows/2)
+        # Next tetromino
+        self._renderer_ntetro_show = False
+        self._renderer_ntetro_offset_column = 0
+        self._renderer_ntetro_offset_row = 0
+        self._renderer_ntetro_num = 1
 
         return True
 
@@ -486,8 +455,9 @@ class TetrisBoard:
 
         # Show score
         if self._renderer_score_show:
-            iface.print_str("Score:", cols=self._renderer_score_offset_column, rows=self._renderer_score_offset_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
-            iface.print_str(f"{self._score:012}", cols=self._renderer_score_offset_column, rows=self._renderer_score_offset_row+1, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+            score_txt = "Score:"
+            iface.print_str(score_txt, cols=self._renderer_score_offset_column-math.floor(len(score_txt)/2), rows=self._renderer_score_offset_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+            iface.print_str(f"{self._score:012}", cols=self._renderer_score_offset_column-6, rows=self._renderer_score_offset_row+1, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
 
 # Main
 ###############################################################################
