@@ -8,6 +8,7 @@ Based on: https://tetris.wiki/Tetris_Guideline
 """
 
 import math
+import random
 
 ###############################################################################
 class TetrominoSingle:
@@ -16,20 +17,20 @@ class TetrominoSingle:
     Class representing a single Tetris piece (tetromino) state
     """
 
-    def __init__(self, piece):
+    def __init__(self, blocks):
         """
         Initialise the basic struture of the tetromino
 
-            piece
-                2 dimensional list representing the piece
+            blocks
+                2 dimensional list representing the tetromino blocks
         """
-        self._piece = piece
-        self._rows = len(piece)
-        self._columns = len(piece[0])
+        self._blocks = blocks
+        self._rows = len(blocks)
+        self._columns = len(blocks[0])
 
     def __str__(self):
         rtn = ""
-        for row in self._piece:
+        for row in self._blocks:
             if len(rtn) > 0:
                 rtn += "\n"
             for cell in row:
@@ -38,6 +39,13 @@ class TetrominoSingle:
                 else:
                     rtn += str(cell)+str(cell)
         return rtn
+
+    def get_blocks(self):
+        return self._blocks
+    def get_columns(self):
+        return self._columns
+    def get_rows(self):
+        return self._rows
 
 ###############################################################################
 class TetrominoComposite:
@@ -136,7 +144,10 @@ class TetrominoComposite:
         Create the prototype I tetromino (colour: light blue)
         """
         i_piece = []
+        i_piece.append([ 0, 0, 0, 0 ])
         i_piece.append([ 1, 1, 1, 1 ])
+        i_piece.append([ 0, 0, 0, 0 ])
+        i_piece.append([ 0, 0, 0, 0 ])
         return TetrominoComposite(i_piece, "I", 1)
 
     @staticmethod
@@ -147,6 +158,7 @@ class TetrominoComposite:
         j_piece = []
         j_piece.append([ 1, 0, 0 ])
         j_piece.append([ 1, 1, 1 ])
+        j_piece.append([ 0, 0, 0 ])
         return TetrominoComposite(j_piece, "J", 2)
 
     @staticmethod
@@ -157,6 +169,7 @@ class TetrominoComposite:
         l_piece = []
         l_piece.append([ 0, 0, 1 ])
         l_piece.append([ 1, 1, 1 ])
+        l_piece.append([ 0, 0, 0 ])
         return TetrominoComposite(l_piece, "L", 3)
 
     @staticmethod
@@ -177,6 +190,7 @@ class TetrominoComposite:
         s_piece = []
         s_piece.append([ 0, 1, 1 ])
         s_piece.append([ 1, 1, 0 ])
+        s_piece.append([ 0, 0, 0 ])
         return TetrominoComposite(s_piece, "S", 5)
 
     @staticmethod
@@ -187,6 +201,7 @@ class TetrominoComposite:
         t_piece = []
         t_piece.append([ 0, 1, 0 ])
         t_piece.append([ 1, 1, 1 ])
+        t_piece.append([ 0, 0, 0 ])
         return TetrominoComposite(t_piece, "T", 6)
 
     @staticmethod
@@ -197,6 +212,7 @@ class TetrominoComposite:
         z_piece = []
         z_piece.append([ 1, 1, 0 ])
         z_piece.append([ 0, 1, 1 ])
+        z_piece.append([ 0, 0, 0 ])
         return TetrominoComposite(z_piece, "Z", 7)
 
     @staticmethod
@@ -204,11 +220,11 @@ class TetrominoComposite:
         """
         Create the prototype test tetromino (colour: N/A)
         """
-        z_piece = []
-        z_piece.append([ 1, 1, 1 ])
-        z_piece.append([ 1, 0, 1 ])
-        z_piece.append([ 0, 0, 1 ])
-        return TetrominoComposite(z_piece, "Test", 1)
+        tst_piece = []
+        tst_piece.append([ 1, 1, 1 ])
+        tst_piece.append([ 1, 0, 1 ])
+        tst_piece.append([ 0, 0, 1 ])
+        return TetrominoComposite(tst_piece, "Test", 1)
 
 ###############################################################################
 class Tetromino:
@@ -260,8 +276,8 @@ class Tetromino:
         self._rotational_state_prev = 0
 
         # Current position on the board
-        self._position_column = -1
-        self._position_row = -1
+        self._position_column = None
+        self._position_row = None
 
     def __str__(self):
         rtn = ""
@@ -270,6 +286,22 @@ class Tetromino:
         rtn += f"Column: {self._position_column}	Row: {self._position_row}\n\n"
         rtn += str(self._composite._pieces[self._rotational_state])
         return rtn
+
+    def get_state(self):
+        """ Return the current block positions for this tetromino """
+        return self._composite._pieces[self._rotational_state]
+
+    def get_posX(self):
+        return self._position_column
+
+    def get_posY(self):
+        return self._position_row
+
+    def set_position(self, column, row):
+        """ Set the position of the tetromino """
+        # Update the current position on the board
+        self._position_column = column
+        self._position_row = row
 
 ###############################################################################
 class TetrisBoard:
@@ -282,11 +314,20 @@ class TetrisBoard:
         """
         Initialise the Tetris board
         """
+        # Need a random number generator for various actions (including initialisation)
+        self._rnd = random.Random()
+
         self._columns = columns
         self._rows = rows
         self._board = []
         self._fill_rows_()
         self._max_colours = colours
+
+        # Tetromino 'bag'
+        self._tetromino_bag = []
+        self.fill_tetromino_bag()
+        # Current tetromino
+        self._tetromino = None
 
         # Current score
         self._score = 0
@@ -295,9 +336,11 @@ class TetrisBoard:
         # Tetromino block size factors
         self._renderer_tetromino_block_height = 1
         self._renderer_tetromino_block_width = 1
-        # Tetris board offset
-        self._renderer_board_offset_column = 0
-        self._renderer_board_offset_row = 0
+        # Tetris board head offset
+        self._renderer_board_column_offset_left = 0
+        self._renderer_board_column_offset_right = 0
+        self._renderer_board_row_offset_top = 0
+        self._renderer_board_row_offset_bottom = 0
         # Score
         self._renderer_score_show = False
         self._renderer_score_offset_column = 0
@@ -348,12 +391,50 @@ class TetrisBoard:
         """
         Fills the board with random data, used for testing
         """
-        import random
-        rnd = random.Random()
         for row_index in range(0, self._rows-1):
             row = self._board[row_index]
             for i in range(self._columns):
-                row[i] = rnd.randrange(0, self._max_colours)
+                row[i] = self._rnd.randrange(0, self._max_colours)
+
+    def get_current_tetromino(self, remove=True):
+        """ Return the active tetromino """
+        return self._tetromino
+
+    def get_next_tetromino(self, remove=True):
+        """
+        Gets the next tetromino from the bag
+        Optionally removes it and sets it as the current tetromino if there is none selected
+        Additionally refills the bag if it's empty
+        """
+        # Get next tetromino
+        if remove and self._tetromino is None:
+            rtn = self._tetromino_bag.pop(0)
+            self._tetromino = rtn
+        else:
+            rtn = self._tetromino_bag[0]
+
+        # Refill bag if empty
+        if len(self._tetromino_bag) == 0:
+            fill_tetromino_bag()
+
+        return rtn
+
+    def fill_tetromino_bag(self):
+        """
+        Fill the tetromoni bag with a single Tetromino piece of every type, then randomise the order (Random Generator)
+        """
+
+        # Add all the different types of Tetromino
+        self._tetromino_bag.append(Tetromino(Tetromino.TETROMINO_I))
+        self._tetromino_bag.append(Tetromino(Tetromino.TETROMINO_J))
+        self._tetromino_bag.append(Tetromino(Tetromino.TETROMINO_L))
+        self._tetromino_bag.append(Tetromino(Tetromino.TETROMINO_O))
+        self._tetromino_bag.append(Tetromino(Tetromino.TETROMINO_S))
+        self._tetromino_bag.append(Tetromino(Tetromino.TETROMINO_T))
+        self._tetromino_bag.append(Tetromino(Tetromino.TETROMINO_Z))
+
+        # Randomise the list
+        self._rnd.shuffle(self._tetromino_bag)
 
     def remove_rows(self):
         """
@@ -378,6 +459,13 @@ class TetrisBoard:
 
         # Added any needed rows
         self._fill_rows_()
+
+    def tetromino_start(self):
+        """
+        Place a newly selected tetromino in it's starting position
+        """
+        if not self._tetromino is None:
+            self._tetromino.set_position(5, 5)
 
 # Interface related methods
 ###############################################################################
@@ -406,8 +494,10 @@ class TetrisBoard:
         self._renderer_tetromino_block_height = tetro_blk_height
         self._renderer_tetromino_block_width = tetro_blk_width
         # Tetris board offset
-        self._renderer_board_offset_column = math.floor(iface._columns/2)-math.floor(((self._columns*tetro_blk_width)+2)/2)
-        self._renderer_board_offset_row = math.floor((iface._rows-needed_rows)/2) + (2 * tetro_blk_height)
+        self._renderer_board_column_offset_left = math.floor(iface._columns/2)-math.floor(((self._columns*tetro_blk_width)+2)/2)
+        self._renderer_board_column_offset_right = self._renderer_board_column_offset_left+(self._columns*tetro_blk_width)
+        self._renderer_board_row_offset_top = math.floor((iface._rows-needed_rows)/2) + (2 * tetro_blk_height)
+        self._renderer_board_row_offset_bottom = self._renderer_board_row_offset_top+(self._rows*tetro_blk_height)
 
         # Try enlarging the tetromino block width
         self.iface_check(iface, tetro_blk_width+1, tetro_blk_height)
@@ -415,9 +505,9 @@ class TetrisBoard:
             self.iface_check(iface, tetro_blk_width, tetro_blk_height+1)
 
         # Score
-        if self._renderer_board_offset_column >= 12:
+        if self._renderer_board_column_offset_left >= 12:
             self._renderer_score_show = True
-            self._renderer_score_offset_column = iface._columns-math.floor(self._renderer_board_offset_column/2)
+            self._renderer_score_offset_column = iface._columns-math.floor(self._renderer_board_column_offset_left/2)
             self._renderer_score_offset_row = math.floor(iface._rows/2)
         # Next tetromino
         self._renderer_ntetro_show = False
@@ -436,7 +526,7 @@ class TetrisBoard:
         row_count = 0
         for row_index in range(self._rows-1, -1, -1):
             for repeat_row in range(0, self._renderer_tetromino_block_height):
-                iface.print_str(u'\u2551', cols=self._renderer_board_offset_column, rows=self._renderer_board_offset_row + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+                iface.print_str(u'\u2551', cols=self._renderer_board_column_offset_left, rows=self._renderer_board_row_offset_top + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
                 row = self._board[row_index]
                 for cell in row:
                     if cell > 0:
@@ -448,7 +538,7 @@ class TetrisBoard:
                 iface.print_str(u'\u2551', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
                 row_count += 1
         # Draw bottom
-        iface.print_str(u'\u255A', cols=self._renderer_board_offset_column, rows=self._renderer_board_offset_row + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+        iface.print_str(u'\u255A', cols=self._renderer_board_column_offset_left, rows=self._renderer_board_row_offset_top + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
         for repeat_column in range(0, self._columns * self._renderer_tetromino_block_width):
             iface.print_str(u'\u2550', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
         iface.print_str(u'\u255D', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
@@ -459,10 +549,38 @@ class TetrisBoard:
             iface.print_str(score_txt, cols=self._renderer_score_offset_column-math.floor(len(score_txt)/2), rows=self._renderer_score_offset_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
             iface.print_str(f"{self._score:012}", cols=self._renderer_score_offset_column-6, rows=self._renderer_score_offset_row+1, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
 
+        # Draw current tetromino
+        if not self._tetromino is None and not (self._tetromino.get_posX() is None or self._tetromino.get_posY() is None):
+            # Get the block configuration to draw
+            tetromino_state = self._tetromino.get_state()
+
+            # Calculate tetromino position
+            tetromino_position_x = self._renderer_board_column_offset_left + 1 + (self._renderer_tetromino_block_width * self._tetromino.get_posX())
+            tetromino_position_y = self._renderer_board_row_offset_bottom - (self._renderer_tetromino_block_height * (self._tetromino.get_posY() + tetromino_state.get_rows()))
+
+            # Draw Tetromino
+            for blocks in tetromino_state.get_blocks():
+                # Set cursor position
+                for repeat_row in range(0, self._renderer_tetromino_block_height):
+                    iface.set_position(tetromino_position_x, tetromino_position_y)
+                    for cell in blocks:
+                        if cell > 0:
+                            cell_txt = u'\u2592' * self._renderer_tetromino_block_width
+                            iface.print_str(cell_txt, attr=iface.TXT_NORMAL, clr=iface.color_pair(cell))
+                        else:
+                            cell_txt = " " * self._renderer_tetromino_block_width
+                            iface.print_str(cell_txt, attr=iface.TXT_BOLD, clr=iface.color_pair(cell))
+                    tetromino_position_y += 1
+
+
 # Main
 ###############################################################################
 if __name__ == '__main__':
-#    tboard = TetrisBoard()
+    tboard = TetrisBoard()
+    for tetromino in tboard._tetromino_bag:
+        print(tetromino)
+    print(tboard._tetromino)
+
 #    tboard._fill_rand_()
 #    print(tboard)
 #    tboard.remove_rows()
@@ -485,6 +603,6 @@ if __name__ == '__main__':
 #    print("Dump: Test")
 #    print(TetrominoComposite.createTest())
 
+#    tet = Tetromino(Tetromino.TETROMINO_TEST)
+#    print(tet)
 
-    tet = Tetromino(Tetromino.TETROMINO_TEST)
-    print(tet)
