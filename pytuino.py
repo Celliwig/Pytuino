@@ -45,22 +45,48 @@ class Pytuino:
     def run(self):
         """ Main routine """
 
+        # Generate new board
         self._board = TetrisBoard()
         if not self._board.iface_check(self._iface):
             raise Exception("Pytuino: screen too small")
 
-        self._board._fill_rand_()
+        # Generate random fill
+        #self._board._fill_rand_()
 
+        # Loop until 'Q' is pressed
         while True:
-            self._board.draw_board(self._iface)
+            # Get the next tetromino if needed
+            if self._board.get_current_tetromino() is None:
+                self._board.get_next_tetromino()
+                self._board.tetromino_start()
 
+            # Redraw screen
+            self._board.draw_board(self._iface)
             self._iface.redraw()
 
-            # Check for quit key
+            # Check for key press
             key = self._iface.get_key()
-            if key == 'Q':
+
+            # Tetromino rotate
+            if key == ord('z') or key == ord('Z'):
+                self._board.tetromino_rotate(Tetromino.DIR_ANTICLOCKWISE)
+            if key == ord('x') or key == ord('X'):
+                self._board.tetromino_rotate(Tetromino.DIR_CLOCKWISE)
+
+            # Tetromino move
+            if key == PytuinoIface.KEY_DOWN:
+                self._board.tetromino_move(Tetromino.DIR_DOWN)
+            if key == PytuinoIface.KEY_LEFT:
+                self._board.tetromino_move(Tetromino.DIR_LEFT)
+            if key == PytuinoIface.KEY_RIGHT:
+                self._board.tetromino_move(Tetromino.DIR_RIGHT)
+
+
+            # Check for quit key
+            if key == ord('Q'):
                 break
 
+            # Sleep for a bit
             time.sleep(0.01)
 
 # Main
