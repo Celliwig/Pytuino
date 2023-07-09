@@ -144,10 +144,10 @@ class TetrominoComposite:
         Create the prototype I tetromino (colour: light blue)
         """
         i_piece = []
-        i_piece.append([ 0, 0, 0, 0 ])
-        i_piece.append([ 1, 1, 1, 1 ])
-        i_piece.append([ 0, 0, 0, 0 ])
-        i_piece.append([ 0, 0, 0, 0 ])
+        i_piece.append([ 0, 1, 0, 0 ])
+        i_piece.append([ 0, 1, 0, 0 ])
+        i_piece.append([ 0, 1, 0, 0 ])
+        i_piece.append([ 0, 1, 0, 0 ])
         return TetrominoComposite(i_piece, "I", 1)
 
     @staticmethod
@@ -233,6 +233,12 @@ class Tetromino:
     Class representing a single Tetromino
     """
 
+    DIR_ANTICLOCKWISE = 0
+    DIR_CLOCKWISE = 1
+    DIR_DOWN = 2
+    DIR_LEFT = 3
+    DIR_RIGHT = 4
+
     TETROMINO_I = 1
     TETROMINO_J = 2
     TETROMINO_L = 3
@@ -296,6 +302,32 @@ class Tetromino:
 
     def get_posY(self):
         return self._position_row
+
+    def rotate(self, direction, test=False):
+        """
+        Rotate (change state) the current tetromino
+
+            test
+                If set, only return the updated rotational state don't save
+        """
+        updated_state = self._rotational_state
+
+        # Update state
+        if direction == Tetromino.DIR_ANTICLOCKWISE:
+            updated_state -= 1
+        if direction == Tetromino.DIR_CLOCKWISE:
+            updated_state += 1
+
+        if updated_state < 0:
+            updated_state = 3
+        if updated_state > 3:
+            updated_state = 0
+
+        # Update current state
+        if not test:
+            self._rotational_state = updated_state
+
+        return self._composite._pieces[updated_state]
 
     def set_position(self, column, row):
         """ Set the position of the tetromino """
@@ -436,29 +468,51 @@ class TetrisBoard:
         # Randomise the list
         self._rnd.shuffle(self._tetromino_bag)
 
-    def remove_rows(self):
-        """
-        Removes any full rows, and inserts replacements at the top of the board
-        """
-        # Scan in reverse order as rows can be removed
-        for row_index in range(self._rows-1, -1, -1):
-            # Select row
-            row = self._board[row_index]
+#    def remove_rows(self):
+#        """
+#        Removes any full rows, and inserts replacements at the top of the board
+#        """
+#        # Scan in reverse order as rows can be removed
+#        for row_index in range(self._rows-1, -1, -1):
+#            # Select row
+#            row = self._board[row_index]
+#
+#            remove_row = True
+#            # Checking each cell
+#            for cell in row:
+#                # For a space
+#                if cell == 0:
+#                    # Which if it exists, we can ignore the row
+#                    remove_row = False
+#                    break
+#            if remove_row:
+#                # Remove selected row
+#                self._board.pop(row_index)
+#
+#        # Added any needed rows
+#        self._fill_rows_()
 
-            remove_row = True
-            # Checking each cell
-            for cell in row:
-                # For a space
-                if cell == 0:
-                    # Which if it exists, we can ignore the row
-                    remove_row = False
-                    break
-            if remove_row:
-                # Remove selected row
-                self._board.pop(row_index)
+    def tetromino_move(self, direction):
+        """
+        Move the current tetromino in the given direction
+        """
+        tmp_x = self._tetromino.get_posX()
+        tmp_y = self._tetromino.get_posY()
 
-        # Added any needed rows
-        self._fill_rows_()
+        if direction == Tetromino.DIR_LEFT:
+            tmp_x -= 1
+        if direction == Tetromino.DIR_RIGHT:
+            tmp_x += 1
+        if direction == Tetromino.DIR_DOWN:
+            tmp_y -= 1
+
+        self._tetromino.set_position(tmp_x, tmp_y)
+
+    def tetromino_rotate(self, direction):
+        """
+        Rotate the current tetromino in the given direction
+        """
+        self._tetromino.rotate(direction)
 
     def tetromino_start(self):
         """
