@@ -74,13 +74,14 @@ class Pytuino:
                 self._board.tetromino_rotate(Tetromino.DIR_CLOCKWISE)
 
             # Tetromino move
+            if key == PytuinoIface.KEY_UP and self._debug:
+                self._board.tetromino_move(Tetromino.DIR_UP)
             if key == PytuinoIface.KEY_DOWN:
                 self._board.tetromino_move(Tetromino.DIR_DOWN)
             if key == PytuinoIface.KEY_LEFT:
                 self._board.tetromino_move(Tetromino.DIR_LEFT)
             if key == PytuinoIface.KEY_RIGHT:
                 self._board.tetromino_move(Tetromino.DIR_RIGHT)
-
 
             # Check for quit key
             if key == ord('Q'):
