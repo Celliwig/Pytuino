@@ -450,6 +450,8 @@ class TetrisBoard:
                 if cell:
                     if tmp_x < 0 or tmp_y < 0 or tmp_x >= self._columns or tmp_y >= self._rows:
                         return False
+                    if self._board[tmp_y][tmp_x] > 0:
+                        return False
                 tmp_x += 1
             tmp_y -= 1
 
@@ -474,7 +476,7 @@ class TetrisBoard:
 
         # Refill bag if empty
         if len(self._tetromino_bag) == 0:
-            fill_tetromino_bag()
+            self.fill_tetromino_bag()
 
         return rtn
 
@@ -519,6 +521,27 @@ class TetrisBoard:
 #        # Added any needed rows
 #        self._fill_rows_()
 
+    def tetromino_attach(self):
+        """
+        Copy blocks from tetromino to the board, and clear current tetromino
+        """
+        tetromino_state = self._tetromino.get_state()
+        position_x = self._tetromino.get_posX()
+        position_y = self._tetromino.get_posY()
+
+        # Copy data from tetromino to the board
+        tmp_y = position_y + (tetromino_state.get_rows() - 1)
+        for blocks in tetromino_state.get_blocks():
+            tmp_x = position_x
+            for cell in blocks:
+                if cell:
+                    self._board[tmp_y][tmp_x] = cell
+                tmp_x += 1
+            tmp_y -= 1
+
+        # Remove current tetromino
+        self._tetromino = None
+
     def tetromino_move(self, direction):
         """
         Move the current tetromino in the given direction
@@ -537,6 +560,9 @@ class TetrisBoard:
 
         if self.check_tetromino_position(position_x=tmp_x, position_y=tmp_y):
             self._tetromino.set_position(tmp_x, tmp_y)
+            return True
+
+        return False
 
     def tetromino_rotate(self, direction):
         """
