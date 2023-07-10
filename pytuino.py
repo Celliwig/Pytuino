@@ -55,6 +55,9 @@ class Pytuino:
 
         # Loop until 'Q' is pressed
         while True:
+            # Flag: Copy the Tetromino to the board
+            affix_tetromino = False
+
             # Get the next tetromino if needed
             if self._board.get_current_tetromino() is None:
                 self._board.get_next_tetromino()
@@ -74,14 +77,22 @@ class Pytuino:
                 self._board.tetromino_rotate(Tetromino.DIR_CLOCKWISE)
 
             # Tetromino move
-            if key == PytuinoIface.KEY_UP and self._debug:
-                self._board.tetromino_move(Tetromino.DIR_UP)
-            if key == PytuinoIface.KEY_DOWN:
-                self._board.tetromino_move(Tetromino.DIR_DOWN)
             if key == PytuinoIface.KEY_LEFT:
                 self._board.tetromino_move(Tetromino.DIR_LEFT)
             if key == PytuinoIface.KEY_RIGHT:
                 self._board.tetromino_move(Tetromino.DIR_RIGHT)
+            if key == PytuinoIface.KEY_UP and self._debug:
+                self._board.tetromino_move(Tetromino.DIR_UP)
+            if key == PytuinoIface.KEY_DOWN:
+                if not self._board.tetromino_move(Tetromino.DIR_DOWN):
+                    affix_tetromino = True
+
+            # Affix Tetromino to the board
+            if affix_tetromino:
+                self._board.tetromino_attach()
+
+            # Remove full lines & update score
+            self._board.update_score(self._board.remove_completed_rows())
 
             # Check for quit key
             if key == ord('Q'):
