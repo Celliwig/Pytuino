@@ -443,14 +443,21 @@ class TetrisBoard:
             position_y = tetromino.get_posY()
 
         # Check whether the tetromino is out of bounds
+        # Calculate the top of the tetromino in board co-ordinates
         tmp_y = position_y + (tetromino_state.get_rows() - 1)
         for blocks in tetromino_state.get_blocks():
+            # Get the left edge of the tetromino in board co-ordinates
             tmp_x = position_x
             for cell in blocks:
                 if cell:
-                    if tmp_x < 0 or tmp_y < 0 or tmp_x >= self._columns or tmp_y >= self._rows:
+                    # Check the lower co-ordinates
+                    if tmp_x < 0 or tmp_y < 0:
                         return False
-                    if self._board[tmp_y][tmp_x] > 0:
+                    # Check the upper bounds (add an extra 4 rows for spawning)
+                    if tmp_x >= self._columns or tmp_y >= (self._rows + 4):
+                        return False
+                    # Check whether this overlaps existing blocks on the board
+                    if (tmp_y < self._rows and tmp_x < self._columns) and self._board[tmp_y][tmp_x] > 0:
                         return False
                 tmp_x += 1
             tmp_y -= 1
@@ -497,29 +504,35 @@ class TetrisBoard:
         # Randomise the list
         self._rnd.shuffle(self._tetromino_bag)
 
-#    def remove_rows(self):
-#        """
-#        Removes any full rows, and inserts replacements at the top of the board
-#        """
-#        # Scan in reverse order as rows can be removed
-#        for row_index in range(self._rows-1, -1, -1):
-#            # Select row
-#            row = self._board[row_index]
-#
-#            remove_row = True
-#            # Checking each cell
-#            for cell in row:
-#                # For a space
-#                if cell == 0:
-#                    # Which if it exists, we can ignore the row
-#                    remove_row = False
-#                    break
-#            if remove_row:
-#                # Remove selected row
-#                self._board.pop(row_index)
-#
-#        # Added any needed rows
-#        self._fill_rows_()
+    def remove_completed_rows(self):
+        """
+        Removes any full rows, and inserts replacements at the top of the board
+        Return the number of removed lines
+        """
+        removed_lines = 0
+
+        # Scan in reverse order as rows can be removed
+        for row_index in range(self._rows-1, -1, -1):
+            # Select row
+            row = self._board[row_index]
+
+            remove_row = True
+            # Checking each cell
+            for cell in row:
+                # For a space
+                if cell == 0:
+                    # Which if it exists, we can ignore the row
+                    remove_row = False
+                    break
+            if remove_row:
+                # Remove selected row
+                self._board.pop(row_index)
+                removed_lines += 1
+
+        # Added any needed rows
+        self._fill_rows_()
+
+        return removed_lines
 
     def tetromino_attach(self):
         """
@@ -576,7 +589,16 @@ class TetrisBoard:
         Place a newly selected tetromino in it's starting position
         """
         if not self._tetromino is None:
-            self._tetromino.set_position(5, 5)
+            # Get the initial state
+            tetromino_state = self._tetromino.get_state()
+            # Set position
+            self._tetromino.set_position(math.floor(self._columns/2)-math.floor(tetromino_state.get_columns()/2), self._rows)
+
+    def update_score(self, lines):
+        """
+        Update the score
+        """
+        self._score += lines * 100
 
 # Interface related methods
 ###############################################################################
