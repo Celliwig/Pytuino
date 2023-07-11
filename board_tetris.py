@@ -7,6 +7,7 @@ Tetris board implemented as a 2 dimensional lists
 Based on: https://tetris.wiki/Tetris_Guideline
 """
 
+import datetime
 import math
 import random
 
@@ -361,6 +362,10 @@ class TetrisBoard:
         self.fill_tetromino_bag()
         # Current tetromino
         self._tetromino = None
+        # Timestamp of the last automatic tetromino progression (in milliseconds)
+        self._tetromino_moved = None
+        # Timer interval for tetromino move (in milliseconds)
+        self._tetroino_move_interval = 1000
 
         # Current score
         self._score = 0
@@ -478,6 +483,7 @@ class TetrisBoard:
         if remove and self._tetromino is None:
             rtn = self._tetromino_bag.pop(0)
             self._tetromino = rtn
+            self._tetromino_moved = math.floor(datetime.datetime.now().timestamp() * 1000)
         else:
             rtn = self._tetromino_bag[0]
 
@@ -554,6 +560,17 @@ class TetrisBoard:
 
         # Remove current tetromino
         self._tetromino = None
+
+    def tetromino_move_auto(self):
+        """
+        Move the current tetromino down after a period of time
+        """
+        now = math.floor(datetime.datetime.now().timestamp() * 1000)
+        if now >= (self._tetromino_moved + self._tetroino_move_interval):
+            self._tetromino_moved = now
+            return True
+        else:
+            return False
 
     def tetromino_move(self, direction):
         """
