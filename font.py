@@ -19,6 +19,7 @@ class Glyph:
 
     # 2nd character
     # L = Left
+    # M = Middle
     # R = Right
 
     # 3rd character
@@ -26,16 +27,18 @@ class Glyph:
     # S = Square
 
     TILE_ULR = u'\u256D'
-    TILE_URR = u'\u25DE'
     TILE_ULS = u'\u250C'
+    TILE_UMS = u'\u252C'
+    TILE_URR = u'\u256E'
     TILE_URS = u'\u2510'
 
     TILE_MLS = u'\u251C'
     TILE_MRS = u'\u2524'
 
     TILE_LLR = u'\u2570'
-    TILE_LRR = u'\u256F'
     TILE_LLS = u'\u2514'
+    TILE_LMS = u'\u2534'
+    TILE_LRR = u'\u256F'
     TILE_LRS = u'\u2518'
 
     TILE_BLANK = u' '
@@ -46,24 +49,62 @@ class Glyph:
     TILE_VERT_UHALF = u'\u2575'
     TILE_VERT_LHALF = u'\u2577'
 
-    # Numbers
-    GLYPH_0 = [ [ TILE_ULS, TILE_URS ], [ TILE_VERT, TILE_VERT ], [ TILE_LLS, TILE_LRS ] ]
-    GLYPH_1 = [ [ TILE_BLANK, TILE_VERT_LHALF ], [ TILE_BLANK, TILE_VERT ], [ TILE_BLANK, TILE_VERT_UHALF ] ]
-    GLYPH_2 = [ [ TILE_HORI_RHALF, TILE_URS ], [ TILE_ULS, TILE_LRS ], [ TILE_LLS, TILE_HORI_LHALF ] ]
-    GLYPH_3 = [ [ TILE_HORI_RHALF, TILE_URS ], [ TILE_HORI_RHALF, TILE_MRS ], [ TILE_HORI_RHALF, TILE_LRS ] ]
-    GLYPH_4 = [ [ TILE_VERT_LHALF, TILE_VERT_LHALF ], [ TILE_LLS, TILE_MRS ], [ TILE_BLANK, TILE_VERT_UHALF ] ]
-    GLYPH_5 = [ [ TILE_ULS, TILE_HORI_LHALF ], [ TILE_LLS, TILE_URS ], [ TILE_HORI_RHALF, TILE_LRS ] ]
-    GLYPH_6 = [ [ TILE_ULS, TILE_HORI_LHALF ], [ TILE_MLS, TILE_URS ], [ TILE_LLS, TILE_LRS ] ]
-    GLYPH_7 = [ [ TILE_HORI_RHALF, TILE_URS ], [ TILE_BLANK, TILE_VERT ], [ TILE_BLANK, TILE_VERT_UHALF ] ]
-    GLYPH_8 = [ [ TILE_ULS, TILE_URS ], [ TILE_MLS, TILE_MRS ], [ TILE_LLS, TILE_LRS ] ]
-    GLYPH_9 = [ [ TILE_ULS, TILE_URS ], [ TILE_LLS, TILE_MRS ], [ TILE_BLANK, TILE_VERT_UHALF ] ]
+    TILE_X = u'\u2573'
+    TILE_BSLASH = u'\u2572'
+    TILE_FSLASH = u'\u2571'
 
+    GLYPH_SPACE = [ [ TILE_BLANK, TILE_BLANK, TILE_BLANK ], [ TILE_BLANK, TILE_BLANK, TILE_BLANK ], [ TILE_BLANK, TILE_BLANK, TILE_BLANK ] ]
+
+    # Numbers
+    GLYPH_0 = [ [ TILE_ULS, TILE_HORI, TILE_URS ], [ TILE_VERT, TILE_FSLASH, TILE_VERT ], [ TILE_LLS, TILE_HORI, TILE_LRS ] ]
+    GLYPH_1 = [ [ TILE_HORI_RHALF, TILE_URS, TILE_BLANK ], [ TILE_BLANK, TILE_VERT, TILE_BLANK ], [ TILE_HORI_RHALF, TILE_LMS, TILE_HORI_LHALF ] ]
+    GLYPH_2 = [ [ TILE_HORI_RHALF, TILE_HORI, TILE_URS ], [ TILE_ULS, TILE_HORI, TILE_LRS ], [ TILE_LLS, TILE_HORI, TILE_HORI_LHALF ] ]
+    GLYPH_3 = [ [ TILE_HORI_RHALF, TILE_HORI, TILE_URS ], [ TILE_HORI_RHALF, TILE_HORI, TILE_MRS ], [ TILE_HORI_RHALF, TILE_HORI, TILE_LRS ] ]
+    GLYPH_4 = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_VERT_LHALF ], [ TILE_LLS, TILE_HORI, TILE_MRS ], [ TILE_BLANK, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_5 = [ [ TILE_ULS, TILE_HORI, TILE_HORI_LHALF ], [ TILE_LLS, TILE_HORI, TILE_URS ], [ TILE_HORI_RHALF, TILE_HORI, TILE_LRS ] ]
+    GLYPH_6 = [ [ TILE_ULS, TILE_HORI, TILE_HORI_LHALF ], [ TILE_MLS, TILE_HORI, TILE_URS ], [ TILE_LLS, TILE_HORI, TILE_LRS ] ]
+    GLYPH_7 = [ [ TILE_HORI_RHALF, TILE_HORI, TILE_URS ], [ TILE_BLANK, TILE_BLANK, TILE_VERT ], [ TILE_BLANK, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_8 = [ [ TILE_ULS, TILE_HORI, TILE_URS ], [ TILE_MLS, TILE_HORI, TILE_MRS ], [ TILE_LLS, TILE_HORI, TILE_LRS ] ]
+    GLYPH_9 = [ [ TILE_ULS, TILE_HORI, TILE_URS ], [ TILE_LLS, TILE_HORI, TILE_MRS ], [ TILE_BLANK, TILE_BLANK, TILE_VERT_UHALF ] ]
+
+    # Uppercase
+    GLYPH_A = [ [ TILE_ULR, TILE_HORI, TILE_URR ], [ TILE_MLS, TILE_HORI, TILE_MRS ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_B = [ [ TILE_ULS, TILE_HORI, TILE_URR ], [ TILE_MLS, TILE_HORI, TILE_MRS ], [ TILE_LLS, TILE_HORI, TILE_LRR ] ]
+    GLYPH_C = [ [ TILE_ULR, TILE_HORI, TILE_HORI_LHALF ], [ TILE_VERT, TILE_BLANK, TILE_BLANK ], [ TILE_LLR, TILE_HORI, TILE_HORI_LHALF ] ]
+    GLYPH_D = [ [ TILE_ULS, TILE_HORI, TILE_URR ], [ TILE_VERT, TILE_BLANK, TILE_VERT ], [ TILE_LLS, TILE_HORI, TILE_LRR ] ]
+    GLYPH_E = [ [ TILE_ULS, TILE_HORI, TILE_HORI_LHALF ], [ TILE_MLS, TILE_HORI, TILE_HORI_LHALF ], [ TILE_LLS, TILE_HORI, TILE_HORI_LHALF ] ]
+    GLYPH_F = [ [ TILE_ULS, TILE_HORI, TILE_HORI_LHALF ], [ TILE_MLS, TILE_HORI, TILE_HORI_LHALF ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_BLANK ] ]
+    GLYPH_G = [ [ TILE_ULR, TILE_HORI, TILE_HORI_LHALF ], [ TILE_VERT, TILE_BLANK, TILE_URS ], [ TILE_LLR, TILE_HORI, TILE_LRR ] ]
+    GLYPH_H = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_VERT_LHALF ], [ TILE_MLS, TILE_HORI, TILE_MRS ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_I = [ [ TILE_HORI_RHALF, TILE_UMS, TILE_HORI_LHALF ], [ TILE_BLANK, TILE_VERT, TILE_BLANK ], [ TILE_HORI_RHALF, TILE_LMS, TILE_HORI_LHALF ] ]
+    GLYPH_J = [ [ TILE_HORI_RHALF, TILE_HORI, TILE_URR ], [ TILE_VERT_LHALF, TILE_BLANK, TILE_VERT ], [ TILE_LLR, TILE_HORI, TILE_LRR ] ]
+    GLYPH_K = [ [ TILE_VERT_LHALF, TILE_ULR, TILE_BLANK ], [ TILE_MLS, TILE_LMS, TILE_URR ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_L = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_BLANK ], [ TILE_VERT, TILE_BLANK, TILE_BLANK ], [ TILE_LLS, TILE_HORI, TILE_HORI_LHALF ] ]
+    GLYPH_M = [ [ TILE_ULS, TILE_UMS, TILE_URS ], [ TILE_VERT, TILE_VERT, TILE_VERT ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_N = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_VERT_LHALF ], [ TILE_VERT, TILE_BSLASH, TILE_VERT ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_O = [ [ TILE_ULR, TILE_HORI, TILE_URR ], [ TILE_VERT, TILE_BLANK, TILE_VERT ], [ TILE_LLR, TILE_HORI, TILE_LRR ] ]
+    GLYPH_P = [ [ TILE_ULS, TILE_HORI, TILE_URR ], [ TILE_MLS, TILE_HORI, TILE_LRR ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_BLANK ] ]
+    GLYPH_Q = [ [ TILE_ULR, TILE_HORI, TILE_URR ], [ TILE_VERT, TILE_BSLASH, TILE_VERT ], [ TILE_LLR, TILE_HORI, TILE_LRR ] ]
+    GLYPH_R = [ [ TILE_ULS, TILE_URR, TILE_BLANK ], [ TILE_MLS, TILE_LMS, TILE_URR ], [ TILE_VERT_UHALF, TILE_BLANK, TILE_VERT_UHALF ] ]
+    GLYPH_S = [ [ TILE_ULR, TILE_HORI, TILE_HORI_LHALF ], [ TILE_LLR, TILE_HORI, TILE_URR ], [ TILE_HORI_RHALF, TILE_HORI, TILE_LRR ] ]
+    GLYPH_T = [ [ TILE_HORI_RHALF, TILE_UMS, TILE_HORI_LHALF ], [ TILE_BLANK, TILE_VERT, TILE_BLANK ], [ TILE_BLANK, TILE_VERT_UHALF, TILE_BLANK ] ]
+    GLYPH_U = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_VERT_LHALF ], [ TILE_VERT, TILE_BLANK, TILE_VERT ], [ TILE_LLR, TILE_HORI, TILE_LRR ] ]
+
+    GLYPH_V = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_BLANK, TILE_VERT_LHALF ], [ TILE_LLR, TILE_BLANK, TILE_BLANK, TILE_LRR ], [ TILE_BLANK, TILE_LLR, TILE_LRR, TILE_BLANK ] ]
+
+    GLYPH_W = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_VERT_LHALF ], [ TILE_VERT, TILE_VERT, TILE_VERT ], [ TILE_LLS, TILE_LMS, TILE_LRS ] ]
+    GLYPH_X = [ [ TILE_BSLASH, TILE_BLANK, TILE_FSLASH ], [ TILE_BLANK, TILE_X, TILE_BLANK ], [ TILE_FSLASH, TILE_BLANK, TILE_BSLASH ] ]
+    GLYPH_Y = [ [ TILE_VERT_LHALF, TILE_BLANK, TILE_VERT_LHALF ], [ TILE_LLR, TILE_UMS, TILE_LRR ], [ TILE_BLANK, TILE_VERT_UHALF, TILE_BLANK ] ]
+    GLYPH_Z = [ [ TILE_HORI_RHALF, TILE_HORI, TILE_HORI_LHALF ], [ TILE_BLANK, TILE_FSLASH, TILE_BLANK ], [ TILE_HORI_RHALF, TILE_HORI, TILE_HORI_LHALF ] ]
 
     def __init__(self, character):
         """
         Class to encapsulate a single character
         """
         self._glyph = []
+
+        if character == ' ':
+            self._glyph = self._create(self.GLYPH_SPACE)
 
         if character == '0':
             self._glyph = self._create(self.GLYPH_0)
@@ -85,6 +126,60 @@ class Glyph:
             self._glyph = self._create(self.GLYPH_8)
         if character == '9':
             self._glyph = self._create(self.GLYPH_9)
+
+        if character == 'A':
+            self._glyph = self._create(self.GLYPH_A)
+        if character == 'B':
+            self._glyph = self._create(self.GLYPH_B)
+        if character == 'C':
+            self._glyph = self._create(self.GLYPH_C)
+        if character == 'D':
+            self._glyph = self._create(self.GLYPH_D)
+        if character == 'E':
+            self._glyph = self._create(self.GLYPH_E)
+        if character == 'F':
+            self._glyph = self._create(self.GLYPH_F)
+        if character == 'G':
+            self._glyph = self._create(self.GLYPH_G)
+        if character == 'H':
+            self._glyph = self._create(self.GLYPH_H)
+        if character == 'I':
+            self._glyph = self._create(self.GLYPH_I)
+        if character == 'J':
+            self._glyph = self._create(self.GLYPH_J)
+        if character == 'K':
+            self._glyph = self._create(self.GLYPH_K)
+        if character == 'L':
+            self._glyph = self._create(self.GLYPH_L)
+        if character == 'M':
+            self._glyph = self._create(self.GLYPH_M)
+        if character == 'N':
+            self._glyph = self._create(self.GLYPH_N)
+        if character == 'O':
+            self._glyph = self._create(self.GLYPH_O)
+        if character == 'P':
+            self._glyph = self._create(self.GLYPH_P)
+        if character == 'Q':
+            self._glyph = self._create(self.GLYPH_Q)
+        if character == 'R':
+            self._glyph = self._create(self.GLYPH_R)
+        if character == 'S':
+            self._glyph = self._create(self.GLYPH_S)
+        if character == 'T':
+            self._glyph = self._create(self.GLYPH_T)
+        if character == 'U':
+            self._glyph = self._create(self.GLYPH_U)
+        if character == 'V':
+            self._glyph = self._create(self.GLYPH_V)
+        if character == 'W':
+            self._glyph = self._create(self.GLYPH_W)
+        if character == 'X':
+            self._glyph = self._create(self.GLYPH_X)
+        if character == 'Y':
+            self._glyph = self._create(self.GLYPH_Y)
+        if character == 'Z':
+            self._glyph = self._create(self.GLYPH_Z)
+
 
     def _create(self, prototype):
         """
@@ -149,5 +244,13 @@ if __name__ == '__main__':
 #    print(g)
 
     fdata = Font.render_string("0123456789")
+    for frow in fdata:
+        print(frow)
+
+    fdata = Font.render_string("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG")
+    for frow in fdata:
+        print(frow)
+
+    fdata = Font.render_string("abcdefghijklmnopqrstuvwxyz")
     for frow in fdata:
         print(frow)
