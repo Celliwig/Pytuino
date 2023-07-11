@@ -608,8 +608,12 @@ class TetrisBoard:
         if not self._tetromino is None:
             # Get the initial state
             tetromino_state = self._tetromino.get_state()
+            # Need to fudge placing 3x3 tetrominos
+            fudge_y = 0
+            if tetromino_state.get_columns() == 3:
+                fudge_y = -1
             # Set position
-            self._tetromino.set_position(math.floor(self._columns/2)-math.floor(tetromino_state.get_columns()/2), self._rows)
+            self._tetromino.set_position(math.floor(self._columns/2)-math.floor(tetromino_state.get_columns()/2), self._rows + fudge_y)
 
     def update_score(self, lines):
         """
