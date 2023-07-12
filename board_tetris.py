@@ -11,6 +11,8 @@ import datetime
 import math
 import random
 
+from font import Font
+
 ###############################################################################
 class TetrominoSingle:
 ###############################################################################
@@ -381,8 +383,10 @@ class TetrisBoard:
         self._renderer_board_row_offset_bottom = 0
         # Score
         self._renderer_score_show = False
+        self._renderer_score_use_font = False
         self._renderer_score_offset_column = 0
         self._renderer_score_offset_row = 0
+        self._renderer_score_digits = 12
         # Next tetromino
         self._renderer_ntetro_show = False
         self._renderer_ntetro_offset_column = 0
@@ -659,10 +663,13 @@ class TetrisBoard:
             self.iface_check(iface, tetro_blk_width, tetro_blk_height+1)
 
         # Score
-        if self._renderer_board_column_offset_left >= 12:
+        if self._renderer_board_column_offset_left >= self._renderer_score_digits:
             self._renderer_score_show = True
             self._renderer_score_offset_column = iface._columns-math.floor(self._renderer_board_column_offset_left/2)
             self._renderer_score_offset_row = math.floor(iface._rows/2)
+            # Check if can use box character font
+            if self._renderer_board_column_offset_left >= (self._renderer_score_digits * Font.character_width):
+                self._renderer_score_use_font = True
         # Next tetromino
         self._renderer_ntetro_show = False
         self._renderer_ntetro_offset_column = 0
@@ -699,9 +706,23 @@ class TetrisBoard:
 
         # Show score
         if self._renderer_score_show:
-            score_txt = "Score:"
-            iface.print_str(score_txt, cols=self._renderer_score_offset_column-math.floor(len(score_txt)/2), rows=self._renderer_score_offset_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
-            iface.print_str(f"{self._score:012}", cols=self._renderer_score_offset_column-6, rows=self._renderer_score_offset_row+1, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+            #score_label_txt = "Score:"
+            score_label_txt = "SCORE:"
+            score_txt = f"{self._score:0{self._renderer_score_digits}}"
+            if self._renderer_score_use_font:
+                tmp_row = self._renderer_score_offset_row - Font.character_width
+                fdata = Font.render_string(score_label_txt)
+                for frow in fdata:
+                    iface.print_str(frow, cols=self._renderer_score_offset_column-math.floor(len(frow)/2), rows=tmp_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+                    tmp_row += 1
+                fdata = Font.render_string(score_txt)
+                for frow in fdata:
+                    iface.print_str(frow, cols=self._renderer_score_offset_column-math.floor(len(frow)/2), rows=tmp_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+                    tmp_row += 1
+
+            else:
+                iface.print_str(score_label_txt, cols=self._renderer_score_offset_column-math.floor(len(score_label_txt)/2), rows=self._renderer_score_offset_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+                iface.print_str(score_txt, cols=self._renderer_score_offset_column-6, rows=self._renderer_score_offset_row+1, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
 
         # Draw current tetromino
         if not self._tetromino is None and not (self._tetromino.get_posX() is None or self._tetromino.get_posY() is None):
