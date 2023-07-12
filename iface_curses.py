@@ -33,6 +33,7 @@ class PytuinoIface:
     COLOUR_WHITE = curses.COLOR_WHITE
     COLOUR_ORANGE = curses.COLOR_WHITE + 1
     COLOUR_PINK = curses.COLOR_WHITE + 2
+    COLOUR_GREY = curses.COLOR_WHITE + 3
 
     def __init__(self):
         """
@@ -60,6 +61,7 @@ class PytuinoIface:
         curses.init_color(PytuinoIface.COLOUR_YELLOW, 1000, 1000, 0)
         curses.init_color(PytuinoIface.COLOUR_ORANGE, 1000, 500, 0)
         curses.init_color(PytuinoIface.COLOUR_PINK, 1000, 300, 580)
+        curses.init_color(PytuinoIface.COLOUR_GREY, 500, 500, 500)
         # Initialise colour pairs
         curses.init_pair(1, PytuinoIface.COLOUR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(2, PytuinoIface.COLOUR_BLUE, curses.COLOR_BLACK)
@@ -70,6 +72,7 @@ class PytuinoIface:
         curses.init_pair(7, PytuinoIface.COLOUR_MAGENTA, curses.COLOR_BLACK)
         curses.init_pair(8, PytuinoIface.COLOUR_PINK, curses.COLOR_BLACK)
 
+        curses.init_pair(254, PytuinoIface.COLOUR_GREY, curses.COLOR_BLACK)
         curses.init_pair(255, PytuinoIface.COLOUR_WHITE, curses.COLOR_BLACK)
 
         # Store screen size
@@ -122,7 +125,7 @@ class PytuinoIface:
         """
         curses.init_pair(index, foreground, background)
 
-    def print_str(self, txt, cols=None, rows=None, attr=None, clr=None):
+    def print_str(self, txt, columns=None, rows=None, attributes=None, colour=None):
         """
         Print a string on screen
 
@@ -132,31 +135,31 @@ class PytuinoIface:
             Column offset
         rows
             Row offset
-        attr
+        attributes
             Attributes to use
-        clr
+        colour
             Colour attributes
         """
-        if cols is None and rows is None:
-            if attr is None and (clr is None or self._stdscreen_has_color is False):
+        if columns is None and rows is None:
+            if attributes is None and (colour is None or self._stdscreen_has_color is False):
                 self._stdscreen.addstr(txt)
             else:
                 attr_combined = 0
-                if not attr is None:
-                    attr_combined |= attr
-                if not clr is None and self._stdscreen_has_color is True:
-                    attr_combined |= clr
+                if not attributes is None:
+                    attr_combined |= attributes
+                if not colour is None and self._stdscreen_has_color is True:
+                    attr_combined |= colour
                 self._stdscreen.addstr(txt, attr_combined)
         else:
-            if attr is None and (clr is None or self._stdscreen_has_color is False):
-                self._stdscreen.addstr(rows, cols, txt)
+            if attributes is None and (colour is None or self._stdscreen_has_color is False):
+                self._stdscreen.addstr(rows, columns, txt)
             else:
                 attr_combined = 0
-                if not attr is None:
-                    attr_combined |= attr
-                if not clr is None and self._stdscreen_has_color is True:
-                    attr_combined |= clr
-                self._stdscreen.addstr(rows, cols, txt, attr_combined)
+                if not attributes is None:
+                    attr_combined |= attributes
+                if not colour is None and self._stdscreen_has_color is True:
+                    attr_combined |= colour
+                self._stdscreen.addstr(rows, columns, txt, attr_combined)
 
     def redraw(self):
         """
@@ -209,7 +212,7 @@ if __name__ == '__main__':
             tmp_len = ptoi._columns - cur_column
             if tmp_len > len(hello_str):
                 tmp_len = len(hello_str)
-            ptoi.print_str(hello_str[0:tmp_len], cols=cur_column, rows=cur_row, attr=curses.A_BOLD, clr=curses.color_pair(2))
+            ptoi.print_str(hello_str[0:tmp_len], columns=cur_column, rows=cur_row, attributes=curses.A_BOLD, colour=curses.color_pair(2))
 
             # Update co-ordinates
             if add_column == 1:
@@ -227,13 +230,13 @@ if __name__ == '__main__':
             cur_column += add_column
             cur_row += add_row
 
-            ptoi.print_str(quit_str, cols=math.floor((ptoi._columns-len(quit_str))/2), rows=(ptoi._rows-1), attr=curses.A_BOLD, clr=curses.color_pair(1))
+            ptoi.print_str(quit_str, columns=math.floor((ptoi._columns-len(quit_str))/2), rows=(ptoi._rows-1), attributes=curses.A_BOLD, colour=curses.color_pair(1))
 
             ptoi.redraw()
 
             # Check for quit key
             key = ptoi.get_key()
-            if key == 'Q':
+            if key == ord('Q'):
                 break
 
             time.sleep(0.05)
