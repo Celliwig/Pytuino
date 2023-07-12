@@ -634,6 +634,16 @@ class TetrisBoard:
 
 # Interface related methods
 ###############################################################################
+    def colour_override(self, iface, colour_default, colour_override):
+        """
+        Used to override the default colour with override, if set
+        Returns color_pair
+        """
+        if colour_override is None:
+            return iface.color_pair(colour_default)
+        else:
+            return iface.color_pair(colour_override)
+
     def iface_check(self, iface, tetro_blk_width=1, tetro_blk_height=1):
         """
         Check whether interface is large enough for the board
@@ -685,7 +695,7 @@ class TetrisBoard:
 
         return True
 
-    def draw_board(self, iface):
+    def draw_board(self, iface, override_colour=None):
         """ Render the game (includng score, etc) to the screen """
         # Clear screen
         iface.clear_screen()
@@ -694,22 +704,22 @@ class TetrisBoard:
         row_count = 0
         for row_index in range(self._rows-1, -1, -1):
             for repeat_row in range(0, self._renderer_tetromino_block_height):
-                iface.print_str(u'\u2551', cols=self._renderer_board_column_offset_left, rows=self._renderer_board_row_offset_top + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+                iface.print_str(u'\u2551', columns=self._renderer_board_column_offset_left, rows=self._renderer_board_row_offset_top + row_count, attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 8, override_colour))
                 row = self._board[row_index]
                 for cell in row:
                     if cell > 0:
                         cell_txt = u'\u2592' * self._renderer_tetromino_block_width
-                        iface.print_str(cell_txt, attr=iface.TXT_NORMAL, clr=iface.color_pair(cell))
+                        iface.print_str(cell_txt, attributes=iface.TXT_NORMAL, colour=self.colour_override(iface, cell, override_colour))
                     else:
                         cell_txt = " " * self._renderer_tetromino_block_width
-                        iface.print_str(cell_txt, attr=iface.TXT_BOLD, clr=iface.color_pair(cell))
-                iface.print_str(u'\u2551', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+                        iface.print_str(cell_txt, attributes=iface.TXT_BOLD, colour=self.colour_override(iface, cell, override_colour))
+                iface.print_str(u'\u2551', attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 8, override_colour))
                 row_count += 1
         # Draw bottom
-        iface.print_str(u'\u255A', cols=self._renderer_board_column_offset_left, rows=self._renderer_board_row_offset_top + row_count, attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+        iface.print_str(u'\u255A', columns=self._renderer_board_column_offset_left, rows=self._renderer_board_row_offset_top + row_count, attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 8, override_colour))
         for repeat_column in range(0, self._columns * self._renderer_tetromino_block_width):
-            iface.print_str(u'\u2550', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
-        iface.print_str(u'\u255D', attr=iface.TXT_BOLD, clr=iface.color_pair(8))
+            iface.print_str(u'\u2550', attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 8, override_colour))
+        iface.print_str(u'\u255D', attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 8, override_colour))
 
         # Show score
         if self._renderer_score_show:
@@ -720,16 +730,16 @@ class TetrisBoard:
                 tmp_row = self._renderer_score_offset_row - Font.character_width
                 fdata = Font.render_string(score_label_txt)
                 for frow in fdata:
-                    iface.print_str(frow, cols=self._renderer_score_offset_column-math.floor(len(frow)/2), rows=tmp_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+                    iface.print_str(frow, columns=self._renderer_score_offset_column-math.floor(len(frow)/2), rows=tmp_row, attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 255, override_colour))
                     tmp_row += 1
                 fdata = Font.render_string(score_txt)
                 for frow in fdata:
-                    iface.print_str(frow, cols=self._renderer_score_offset_column-math.floor(len(frow)/2), rows=tmp_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+                    iface.print_str(frow, columns=self._renderer_score_offset_column-math.floor(len(frow)/2), rows=tmp_row, attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 255, override_colour))
                     tmp_row += 1
 
             else:
-                iface.print_str(score_label_txt, cols=self._renderer_score_offset_column-math.floor(len(score_label_txt)/2), rows=self._renderer_score_offset_row, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
-                iface.print_str(score_txt, cols=self._renderer_score_offset_column-6, rows=self._renderer_score_offset_row+1, attr=iface.TXT_BOLD, clr=iface.color_pair(255))
+                iface.print_str(score_label_txt, columns=self._renderer_score_offset_column-math.floor(len(score_label_txt)/2), rows=self._renderer_score_offset_row, attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 255, override_colour))
+                iface.print_str(score_txt, columns=self._renderer_score_offset_column-6, rows=self._renderer_score_offset_row+1, attributes=iface.TXT_BOLD, colour=self.colour_override(iface, 255, override_colour))
 
         # Draw current tetromino
         if not self._tetromino is None and not (self._tetromino.get_posX() is None or self._tetromino.get_posY() is None):
@@ -748,7 +758,7 @@ class TetrisBoard:
                     for cell in blocks:
                         if cell > 0:
                             cell_txt = u'\u2592' * self._renderer_tetromino_block_width
-                            iface.print_str(cell_txt, attr=iface.TXT_NORMAL, clr=iface.color_pair(cell))
+                            iface.print_str(cell_txt, attributes=iface.TXT_NORMAL, colour=self.colour_override(iface, cell, override_colour))
                         else:
                             iface.skip_ch(self._renderer_tetromino_block_width)
                     tetromino_position_y += 1
