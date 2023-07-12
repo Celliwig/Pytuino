@@ -42,7 +42,26 @@ class Pytuino:
         """ Close down interface """
         self._iface.close()
 
-    def run(self):
+    def game_over(self):
+        """ Display 'Game Over' over greyed board """
+        # Redraw screen greyed
+        self._board.draw_board(self._iface, override_colour=254)
+        self._board.draw_gameover(self._iface)
+        self._iface.redraw()
+
+        # Loop until 'Q' is pressed
+        while True:
+            # Check for key press
+            key = self._iface.get_key()
+
+            # Check for quit key
+            if key == ord('Q'):
+                break
+
+            # Sleep for a bit
+            time.sleep(0.01)
+
+    def play(self):
         """ Main routine """
 
         # Generate new board
@@ -90,7 +109,9 @@ class Pytuino:
 
             # Affix Tetromino to the board
             if affix_tetromino:
-                self._board.tetromino_attach()
+                if not self._board.tetromino_attach():
+                    # If it cant attach, it's game over
+                    break
 
             # Remove full lines & update score
             self._board.update_score(self._board.remove_completed_rows())
@@ -124,7 +145,8 @@ if __name__ == '__main__':
     err = None
     try:
         pto = Pytuino(debug=args.debug)
-        pto.run()
+        pto.play()
+        pto.game_over()
     except Exception as e:
         err = e
     finally:
