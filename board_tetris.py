@@ -763,6 +763,24 @@ class TetrisBoard:
                             iface.skip_ch(self._renderer_tetromino_block_width)
                     tetromino_position_y += 1
 
+    def draw_gameover(self, iface):
+        """
+        Draw 'Game Over' text
+        """
+        gameover_txt = "GAME OVER"
+
+        if iface._columns >= (len(gameover_txt) * Font.character_width):
+            tmp_row = self._renderer_score_offset_row - Font.character_width
+
+            fdata = Font.render_string(gameover_txt)
+            for frow in fdata:
+                iface.print_str(frow, columns=math.floor(iface._columns/2)-math.floor(len(frow)/2), rows=tmp_row, colour=iface.color_pair(6))
+                tmp_row += 1
+        else:
+            iface.print_str(gameover_txt, columns=math.floor(iface._columns/2)-math.floor(len(gameover_txt)/2), rows=self._renderer_score_offset_row, colour=iface.color_pair(6))
+
+
+
 # Main
 ###############################################################################
 if __name__ == '__main__':
