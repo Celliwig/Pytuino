@@ -630,7 +630,14 @@ class TetrisBoard:
         """
         Update the score
         """
-        self._score += lines * 100
+        if lines == 1:
+            self._score += 40
+        if lines == 2:
+            self._score += 100
+        if lines == 3:
+            self._score += 300
+        if lines == 4:
+            self._score += 1200
 
 # Interface related methods
 ###############################################################################
