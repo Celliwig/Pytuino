@@ -83,7 +83,8 @@ class Pytuino:
                 self._board.tetromino_move(Tetromino.DIR_RIGHT)
             if key == PytuinoIface.KEY_UP and self._debug:
                 self._board.tetromino_move(Tetromino.DIR_UP)
-            if key == PytuinoIface.KEY_DOWN:
+            # Check for the down key, or timer expiry
+            if key == PytuinoIface.KEY_DOWN or (self._board.tetromino_move_auto() and not self._debug):
                 if not self._board.tetromino_move(Tetromino.DIR_DOWN):
                     affix_tetromino = True
 
