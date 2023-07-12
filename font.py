@@ -53,7 +53,15 @@ class Glyph:
     TILE_BSLASH = u'\u2572'
     TILE_FSLASH = u'\u2571'
 
+    TILE_DOT_UL = u'\u2598'
+    TILE_DOT_UR = u'\u259D'
+    TILE_DOT_LL = u'\u2596'
+    TILE_DOT_LR = u'\u2597'
+
+    # Symbols
     GLYPH_SPACE = [ [ TILE_BLANK, TILE_BLANK, TILE_BLANK ], [ TILE_BLANK, TILE_BLANK, TILE_BLANK ], [ TILE_BLANK, TILE_BLANK, TILE_BLANK ] ]
+    GLYPH_PERIOD = [ [ TILE_BLANK, TILE_BLANK, TILE_BLANK ], [ TILE_BLANK, TILE_BLANK, TILE_BLANK ], [ TILE_BLANK, TILE_BLANK, TILE_DOT_UL ] ]
+    GLYPH_COLON = [ [ TILE_BLANK, TILE_DOT_LL, TILE_BLANK ], [ TILE_BLANK, TILE_BLANK, TILE_BLANK ], [ TILE_BLANK, TILE_DOT_UL, TILE_BLANK ] ]
 
     # Numbers
     GLYPH_0 = [ [ TILE_ULS, TILE_HORI, TILE_URS ], [ TILE_VERT, TILE_FSLASH, TILE_VERT ], [ TILE_LLS, TILE_HORI, TILE_LRS ] ]
@@ -105,6 +113,10 @@ class Glyph:
 
         if character == ' ':
             self._glyph = self._create(self.GLYPH_SPACE)
+        if character == '.':
+            self._glyph = self._create(self.GLYPH_PERIOD)
+        if character == ':':
+            self._glyph = self._create(self.GLYPH_COLON)
 
         if character == '0':
             self._glyph = self._create(self.GLYPH_0)
@@ -214,6 +226,8 @@ class Font:
     Render text using the box characters
     """
 
+    character_width = 3
+
     @staticmethod
     def render_string(string):
         """
@@ -251,6 +265,10 @@ if __name__ == '__main__':
     for frow in fdata:
         print(frow)
 
-    fdata = Font.render_string("abcdefghijklmnopqrstuvwxyz")
+#    fdata = Font.render_string("abcdefghijklmnopqrstuvwxyz")
+#    for frow in fdata:
+#        print(frow)
+
+    fdata = Font.render_string(":.")
     for frow in fdata:
         print(frow)
