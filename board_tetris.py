@@ -558,12 +558,19 @@ class TetrisBoard:
             tmp_x = position_x
             for cell in blocks:
                 if cell:
-                    self._board[tmp_y][tmp_x] = cell
+                    # Check if there are blocks outside of the board area
+                    if tmp_y >= self._rows:
+                        # If there are, game over
+                        return False
+                    else:
+                        self._board[tmp_y][tmp_x] = cell
                 tmp_x += 1
             tmp_y -= 1
 
         # Remove current tetromino
         self._tetromino = None
+
+        return True
 
     def tetromino_move_auto(self):
         """
