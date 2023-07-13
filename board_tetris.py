@@ -4,7 +4,7 @@ Pytuino Tetris Board
 
 Tetris board implemented as a 2 dimensional lists
 
-Based on: https://tetris.wiki/Tetris_Guideline
+Reference: https://tetris.wiki/Tetris_Guideline
 """
 
 import datetime
@@ -54,7 +54,7 @@ class TetrominoSingle:
 class TetrominoComposite:
 ###############################################################################
     """
-    Super class of a tetromino which holds all it's rotations
+    Tetromino class which holds all it's rotations
     """
 
     def __init__(self, piece, name, colour):
